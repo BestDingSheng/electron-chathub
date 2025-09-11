@@ -22,6 +22,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
+      fail-fast: false  # 让一个平台失败不影响其他平台
     
     steps:
       - name: Checkout
@@ -36,6 +37,16 @@ jobs:
           node-version: '18'
           cache: 'npm'
 
+      - name: Disable pnpm
+        run: |
+          echo "Disabling pnpm detection"
+          rm -f pnpm-lock.yaml
+          rm -f pnpm-workspace.yaml
+          npm config set package-manager npm
+
+      - name: Clear npm cache
+        run: npm cache clean --force
+
       - name: Install dependencies
         run: npm ci
 
@@ -46,6 +57,8 @@ jobs:
         run: npm run dist
         env:
           GH_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+          NODE_ENV: production
+          npm_config_user_agent: npm
 
       - name: Semantic Release
         env:

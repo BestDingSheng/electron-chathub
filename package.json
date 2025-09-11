@@ -118,6 +118,8 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
-    }
+    },
+    "nodeGypRebuild": false,
+    "buildDependenciesFromSource": false
   }
 }
