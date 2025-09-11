@@ -1,0 +1,38 @@
+{
+  "branches": ["main"],
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    "@semantic-release/changelog",
+    [
+      "@semantic-release/github",
+      {
+        "assets": [
+          {
+            "path": "dist/*.dmg",
+            "label": "macOS 安装包"
+          },
+          {
+            "path": "dist/*.exe",
+            "label": "Windows 安装包"
+          },
+          {
+            "path": "dist/*.AppImage",
+            "label": "Linux AppImage"
+          },
+          {
+            "path": "dist/*.deb",
+            "label": "Linux Debian 包"
+          }
+        ]
+      }
+    ],
+    [
+      "@semantic-release/git",
+      {
+        "assets": ["CHANGELOG.md"],
+        "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+      }
+    ]
+  ]
+}

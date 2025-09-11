@@ -17,7 +17,9 @@
     "dist": "npm run build && electron-builder",
     "dist-mac": "npm run build && electron-builder --mac",
     "dist-win": "npm run build && electron-builder --win",
-    "dist-linux": "npm run build && electron-builder --linux"
+    "dist-linux": "npm run build && electron-builder --linux",
+    "release": "semantic-release",
+    "release:dry-run": "semantic-release --dry-run"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -73,6 +75,9 @@
     "zod": "3.25.67"
   },
   "devDependencies": {
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^9.2.6",
     "@tailwindcss/postcss": "^4.1.9",
     "@types/node": "^22",
     "@types/react": "^18",
@@ -83,6 +88,7 @@
     "electron-builder": "^26.0.12",
     "electron-updater": "^6.6.2",
     "postcss": "^8.5",
+    "semantic-release": "^22.0.12",
     "tailwindcss": "^4.1.9",
     "tw-animate-css": "1.3.3",
     "typescript": "^5",
