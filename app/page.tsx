@@ -19,9 +19,9 @@ import {
   ChevronRight,
   ZoomIn,
   ZoomOut,
-  RotateCcw,
   ExternalLink,
   AlertTriangle,
+  MessageCircle,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useElectron } from "@/hooks/use-electron"
@@ -42,7 +42,7 @@ interface AIService {
 export default function HomePage() {
   const { isElectron } = useElectron()
   const [layout, setLayout] = useState<LayoutType>("double")
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true)
   const [activeServices, setActiveServices] = useState<string[]>(["kimi", "chatgpt-web"])
   const [serviceZoom, setServiceZoom] = useState<Record<string, number>>({})
   const [windowServices, setWindowServices] = useState<Record<number, string>>({
@@ -120,6 +120,24 @@ export default function HomePage() {
       canUseIframe: false,
       requiresNewWindow: true,
     },
+    {
+      id: "doubao",
+      name: "豆包",
+      url: "https://www.doubao.com/chat",
+      icon: MessageCircle,
+      color: "bg-blue-600",
+      description: "字节跳动AI助手",
+      canUseIframe: true,
+    },
+    {
+      id: "tongyi",
+      name: "通义千问",
+      url: "https://www.tongyi.com/",
+      icon: MessageCircle,
+       color: "bg-green-500",
+      description: "阿里云大模型",
+      canUseIframe: true,
+    },
   ]
 
   const layoutOptions = [
@@ -156,10 +174,6 @@ export default function HomePage() {
       const newZoom = Math.max(0.5, Math.min(2, currentZoom + delta))
       return { ...prev, [serviceId]: newZoom }
     })
-  }
-
-  const resetZoom = (serviceId: string) => {
-    setServiceZoom((prev) => ({ ...prev, [serviceId]: 1 }))
   }
 
   const getLayoutClasses = () => {
@@ -201,9 +215,9 @@ export default function HomePage() {
   }
 
   const openInElectronWindow = async (service: AIService) => {
-    if (isElectron && electronAPI?.createServiceWindow) {
+    if (isElectron && (window as any).electronAPI?.createServiceWindow) {
       try {
-        await electronAPI.createServiceWindow(service.id, service.name, service.url)
+        await (window as any).electronAPI.createServiceWindow(service.id, service.name, service.url)
       } catch (error) {
         console.error('Failed to create service window:', error)
         // 降级到浏览器窗口
@@ -236,20 +250,6 @@ export default function HomePage() {
           sidebarCollapsed ? "w-16" : "w-48",
         )}
       >
-        <div className="p-3 border-b border-sidebar-border">
-          <div className="flex items-center justify-between">
-            {!sidebarCollapsed && <h1 className="text-lg font-bold text-sidebar-foreground">AI Hub</h1>}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className="text-sidebar-foreground hover:bg-sidebar-accent flex-shrink-0"
-            >
-              {sidebarCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-            </Button>
-          </div>
-        </div>
-
         <div className="p-4 border-b border-sidebar-border">
           <div className="space-y-2">
             {!sidebarCollapsed && <h3 className="text-sm font-medium text-sidebar-foreground">布局</h3>}
@@ -280,45 +280,19 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div className="flex-1 p-4 space-y-2 overflow-y-auto">
-          {!sidebarCollapsed && <h3 className="text-sm font-medium text-sidebar-foreground">AI 服务</h3>}
-          <div className="space-y-1">
-            {aiServices.map((service) => {
-              const Icon = service.icon
-              const isActive = activeServices.includes(service.id)
-              const requiresWindow = service.requiresNewWindow || !service.canUseIframe
-              
-              return (
-                <Button
-                  key={service.id}
-                  variant={isActive ? "default" : "ghost"}
-                  size="sm"
-                  onClick={() => handleServiceClick(service)}
-                  className={cn(
-                    "w-full justify-start gap-2 h-8 text-xs font-normal",
-                    sidebarCollapsed ? "px-2" : "px-3",
-                    isActive
-                      ? "bg-sidebar-primary text-sidebar-primary-foreground"
-                      : "text-sidebar-foreground hover:bg-sidebar-accent"
-                  )}
-                  title={sidebarCollapsed ? service.name : undefined}
-                >
-                  <div className={cn("w-3 h-3 rounded flex items-center justify-center flex-shrink-0", service.color)}>
-                    <Icon className="h-2 w-2 text-white" />
-                  </div>
-                  {!sidebarCollapsed && (
-                    <div className="flex-1 flex items-center justify-between">
-                      <span className="truncate">{service.name}</span>
-                      {requiresWindow && (
-                        <ExternalLink className="h-2 w-2 text-muted-foreground flex-shrink-0" />
-                      )}
-                    </div>
-                  )}
-                </Button>
-              )
-            })}
-          </div>
+        <div className="flex-1" />
+
+        <div className="p-3 border-t border-sidebar-border">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            className="text-sidebar-foreground hover:bg-sidebar-accent flex-shrink-0 w-full"
+          >
+            {sidebarCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+          </Button>
         </div>
+
       </div>
 
       <div className="flex-1 flex flex-col">
@@ -328,17 +302,11 @@ export default function HomePage() {
               {Array.from({ length: getWindowCount() }).map((_, index) => {
                 const serviceId = windowServices[index] || aiServices[0].id
                 const service = aiServices.find((s) => s.id === serviceId) || aiServices[0]
-                const Icon = service.icon
                 const zoom = serviceZoom[service.id] || 1
                 const hasError = iframeErrors[service.id]
                 return (
                   <Card key={index} className="flex flex-col h-full min-h-[600px]">
                     <div className="flex items-center gap-3 px-3 py-1 border-b border-border">
-                      <div
-                        className={cn("w-6 h-6 rounded flex items-center justify-center flex-shrink-0", service.color)}
-                      >
-                        <Icon className="h-3 w-3 text-white" />
-                      </div>
                       <Select value={serviceId} onValueChange={(value) => changeWindowService(index, value)}>
                         <SelectTrigger className="w-auto border-0 p-0 h-auto font-medium text-card-foreground bg-transparent hover:bg-accent">
                           <SelectValue />
@@ -349,8 +317,8 @@ export default function HomePage() {
                             return (
                               <SelectItem key={s.id} value={s.id}>
                                 <div className="flex items-center gap-2">
-                                  <div className={cn("w-4 h-4 rounded flex items-center justify-center", s.color)}>
-                                    <ServiceIcon className="h-2 w-2 text-white" />
+                                  <div className={cn("w-6 h-6 rounded flex items-center justify-center", s.color)}>
+                                    <ServiceIcon className="h-3 w-3 text-white" />
                                   </div>
                                   {s.name}
                                 </div>
@@ -382,15 +350,6 @@ export default function HomePage() {
                               title="放大"
                             >
                               <ZoomIn className="h-3 w-3" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => resetZoom(service.id)}
-                              className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
-                              title="重置缩放"
-                            >
-                              <RotateCcw className="h-3 w-3" />
                             </Button>
                           </>
                         )}
@@ -470,7 +429,9 @@ export default function HomePage() {
                   const Icon = service.icon
                   return (
                     <Button key={service.id} onClick={() => handleServiceClick(service)} className="gap-2">
-                      <Icon className="h-4 w-4" />
+                      <div className={cn("w-6 h-6 rounded flex items-center justify-center", service.color)}>
+                        <Icon className="h-3 w-3 text-white" />
+                      </div>
                       试用 {service.name}
                     </Button>
                   )
