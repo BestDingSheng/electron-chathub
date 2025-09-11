@@ -1,4 +1,4 @@
-# URL Layout Manager
+# electron-chathub
 
 一个基于 Next.js 14 的 AI 服务聚合管理工具，允许用户在不同的布局视图中访问和管理多个 AI 服务的网页界面。
 
