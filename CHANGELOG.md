@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/BestDingSheng/electron-chathub/compare/v1.0.0...v1.0.1) (2025-09-15)
+
+
+### Bug Fixes
+
+* **ci:** 修正 semantic-release 的资产路径 ([508bd89](https://github.com/BestDingSheng/electron-chathub/commit/508bd89c3ade0309c7bc26c43dc585e5d3d197cf))
+
 # 1.0.0 (2025-09-15)
 
 
