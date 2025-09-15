@@ -9,19 +9,19 @@
       {
         "assets": [
           {
-            "path": "dist/*.dmg",
+            "path": "artifacts/*.dmg",
             "label": "macOS 安装包"
           },
           {
-            "path": "dist/*.exe",
+            "path": "artifacts/*.exe",
             "label": "Windows 安装包"
           },
           {
-            "path": "dist/*.AppImage",
+            "path": "artifacts/*.AppImage",
             "label": "Linux AppImage"
           },
           {
-            "path": "dist/*.deb",
+            "path": "artifacts/*.deb",
             "label": "Linux Debian 包"
           }
         ]
